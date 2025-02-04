@@ -4,3 +4,11 @@ export const navLinks = [
     { href: "#add-new", label: "Add New" },
     { href: "#contact", label: "Contact Us" },
 ];
+
+export const categories = [
+    "Food",
+    "Transportation",
+    "Entertainment",
+    "Shopping",
+    "Others",
+]

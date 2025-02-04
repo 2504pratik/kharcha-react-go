@@ -1,6 +1,6 @@
 const Hero = () => {
     return (
-      <section id="home" className="flex items-center w-full min-h-screen">
+      <section id="home" className="flex items-center w-full">
         <div className="grid grid-cols-2 w-full h-full">
             {/* Left Content */}
             <div className="flex flex-col justify-center items-start space-y-6 px-12">
@@ -11,7 +11,7 @@ const Hero = () => {
                   bg-clip-text text-transparent
                   inline-block mt-4">
                 Kha₹cha
-              </span>
+                </span>
             </h1>
             <p className="text-slate-500 text-xl max-w-lg">
               We are providing the easiest way to manage expenses. Get a full view so you know where to save.

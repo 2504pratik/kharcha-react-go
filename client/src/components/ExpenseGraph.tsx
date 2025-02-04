@@ -37,9 +37,9 @@ const chartConfig = {
 
 export function ExpenseGraph() {
   return (
-    <Card className="bg-gray-900/50 border-gray-800">
-      <CardHeader>
-        <CardTitle className="text-4xl text-slate-300">Spending Overview</CardTitle>
+    <Card className="flex flex-col bg-gray-900/50 border-gray-800">
+      <CardHeader >
+        <CardTitle className="text-slate-300">Spending Overview</CardTitle>
         <CardDescription>
           Showing total spending for the last 6 months
         </CardDescription>

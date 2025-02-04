@@ -2,7 +2,7 @@ import { navLinks } from "@/constants"
 
 const Navbar = () => {
     return (
-        <header>
+        <header >
             <nav className="flex items-center justify-between px-3 py-3 border-b border-yellow-50">
                 <a href="/">
                     <div className="flex items-center space-x-2">
