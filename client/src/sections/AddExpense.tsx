@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card } from "@/components/ui/card"
 import { categories } from '@/constants';
+import { motion } from 'framer-motion';
 
 const AddExpense = () => {
   const [expenseData, setExpenseData] = useState({
@@ -45,10 +46,14 @@ const AddExpense = () => {
   return (
     <section id="add-new" className="py-4">
     <div className="container mx-auto px-6">
-      <div className="grid grid-cols-2 gap-12">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-2 gap-12">
         <div className="space-y-6">
           <h2 className="text-4xl font-bold text-slate-100">Add New Kha₹cha</h2>
-          <p className="text-gray-400">
+          <p className="text-gray-400 border-l border-slate-400 pl-6 italic">
             Keep track of your spending by adding your expenses. We'll help you categorize
             and analyze your spending patterns.
           </p>
@@ -163,7 +168,7 @@ const AddExpense = () => {
             </button>
           </form>
         </Card>
-      </div>
+      </motion.div>
     </div>
   </section>
   )

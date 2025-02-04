@@ -1,9 +1,14 @@
 import { Github, Linkedin, Globe } from "lucide-react"
+import { motion } from "framer-motion"
 
 const Contact = () => {
   return (
     <section id="contact" className="py-24 bg-black text-white">
-      <div className="container mx-auto px-6 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-6 text-center">
         <h2 className="text-4xl font-bold mb-8">Get In Touch</h2>
         <p className="mb-8 text-lg">I'd love to hear from you! Whether you have a question or just want to say hi, feel free to connect.</p>
         <div className="flex justify-center space-x-8">
@@ -17,7 +22,7 @@ const Contact = () => {
             <Globe className="w-10 h-10" />
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

@@ -26,10 +26,13 @@ const Navbar = () => {
                     </li>
                   ))}
                 </ul>
-                <button className="px-4 py-2 rounded-lg bg-transparent
-                    border border-solid border-yellow-50
-                    hover:bg-yellow-50 hover:text-gray-950 transition-colors">
-                    Log in →
+                <button
+                  className="px-4 py-2 rounded-lg bg-transparent
+                  border border-solid border-yellow-50
+                  hover:bg-yellow-50 hover:text-gray-950 transition-colors"
+                  onClick={() => window.location.href = '/login'}
+                >
+                  Log in →
                 </button>
             </nav>
       </header>

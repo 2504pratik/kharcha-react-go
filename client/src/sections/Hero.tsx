@@ -1,7 +1,13 @@
+import { motion } from 'framer-motion';
+
 const Hero = () => {
     return (
       <section id="home" className="flex items-center w-full">
-        <div className="grid grid-cols-2 w-full h-full">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-2 w-full h-full">
             {/* Left Content */}
             <div className="flex flex-col justify-center items-start space-y-6 px-12">
             <h1 className="text-6xl font-bold text-slate-300">
@@ -13,11 +19,13 @@ const Hero = () => {
                 Kha₹cha
                 </span>
             </h1>
-            <p className="text-slate-500 text-xl max-w-lg">
+            <blockquote className="text-slate-500 text-xl max-w-lg border-l border-slate-400 pl-6 italic">
               We are providing the easiest way to manage expenses. Get a full view so you know where to save.
               Track spending, detect fraud, and keep tabs on rising subscription costs.
-            </p>
-            <button className="px-8 py-3 rounded-lg 
+            </blockquote>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="px-8 py-3 rounded-lg 
                     border border-solid border-yellow-50
                     bg-transparent hover:bg-yellow-50 hover:text-gray-950 transition-colors text-lg">
               Get Started
@@ -63,7 +71,7 @@ const Hero = () => {
                     <img src="finance.png" alt="Plan Goals" className="bg-pink-50 w-full h-full object-cover" />
                 </div>
             </div>
-        </div>
+        </motion.div>
       </section>
     )
   }
