@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"os"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,32 +12,27 @@ func CreateToken(userId string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = userId
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires in 24 hours
+	claims["exp"] = time.Now().Add(30 * 24 * time.Hour).Unix() // 30 days
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
+	token := c.Cookies("token")
+	if token == "" {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
-	if err != nil || !token.Valid {
+	if err != nil || !parsedToken.Valid {
+		c.ClearCookie("token")
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid token"})
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
+	claims := parsedToken.Claims.(jwt.MapClaims)
 	c.Locals("user_id", claims["user_id"])
 	return c.Next()
 }

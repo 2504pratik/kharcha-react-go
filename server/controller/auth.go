@@ -50,8 +50,17 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create token"})
 	}
 
+	cookie := new(fiber.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	cookie.Expires = time.Now().Add(30 * 24 * time.Hour)
+	cookie.HTTPOnly = true
+	cookie.Secure = false
+	cookie.SameSite = "Strict"
+
+	c.Cookie(cookie)
+
 	return c.Status(201).JSON(fiber.Map{
-		"token": token,
 		"user": fiber.Map{
 			"id":       user.ID,
 			"username": user.Username,
@@ -84,11 +93,29 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create token"})
 	}
 
+	cookie := new(fiber.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	cookie.Expires = time.Now().Add(30 * 24 * time.Hour)
+	cookie.HTTPOnly = true
+	cookie.Secure = false
+	cookie.SameSite = "Strict"
+
+	c.Cookie(cookie)
+
 	return c.Status(200).JSON(fiber.Map{
-		"token": token,
 		"user": fiber.Map{
 			"id":       user.ID,
 			"username": user.Username,
 		},
 	})
+}
+
+func Logout(c *fiber.Ctx) error {
+	c.Cookie(&fiber.Cookie{
+		Name:    "token",
+		Value:   "",
+		Expires: time.Now().Add(-time.Hour),
+	})
+	return c.SendStatus(200)
 }

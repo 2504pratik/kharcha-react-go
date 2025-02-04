@@ -25,8 +25,9 @@ func main() {
 
 	if os.Getenv("ENV") == "development" {
 		app.Use(cors.New(cors.Config{
-			AllowOrigins: "*",
-			AllowMethods: "GET,POST,PATCH,DELETE",
+			AllowOrigins:     "http://localhost:5173, http://localhost:3000, http://0.0.0.0:5173",
+			AllowMethods:     "GET,POST,PATCH,DELETE",
+			AllowCredentials: true,
 		}))
 	}
 
@@ -39,6 +40,7 @@ func main() {
 
 	app.Post("/api/auth/register", controller.Register)
 	app.Post("/api/auth/login", controller.Login)
+	app.Post("/api/auth/logout", controller.Logout)
 
 	app.Get("/api/expenses", middleware.AuthMiddleware, controller.GetExpenses)
 	app.Get("/api/expenses/:id", middleware.AuthMiddleware, controller.GetExpense)
