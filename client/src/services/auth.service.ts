@@ -1,16 +1,9 @@
 import { BASE_URL } from "@/main";
 
-interface AuthResponse {
-    user: {
-      id: string;
-      username: string;
-    };
-    access_token: string;
-  }
   
-  let accessToken: string | null = null;
+let accessToken: string | null = null;
   
-  export const authService = {
+export const authService = {
     getAccessToken: () => accessToken,
     
     setAccessToken: (token: string) => {
@@ -40,4 +33,4 @@ interface AuthResponse {
         throw error;
       }
     }
-  };
+};
