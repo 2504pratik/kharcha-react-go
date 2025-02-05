@@ -20,14 +20,12 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	// Check if username already exists
 	existingUser := model.User{}
 	err := utils.UserCollection.FindOne(context.Background(), bson.M{"username": user.Username}).Decode(&existingUser)
 	if err == nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Username already exists"})
 	}
 
-	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
@@ -36,35 +34,32 @@ func Register(c *fiber.Ctx) error {
 	user.ID = primitive.NewObjectID()
 	user.Password = string(hashedPassword)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	_, err = utils.UserCollection.InsertOne(ctx, user)
+	_, err = utils.UserCollection.InsertOne(context.Background(), user)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create user"})
 	}
 
-	// Create JWT token
-	token, err := middleware.CreateToken(user.ID.Hex())
+	accessToken, refreshToken, err := middleware.CreateTokenPair(user.ID.Hex())
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create token"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create tokens"})
 	}
 
-	cookie := new(fiber.Cookie)
-	cookie.Name = "token"
-	cookie.Value = token
-	cookie.Expires = time.Now().Add(30 * 24 * time.Hour)
-	cookie.HTTPOnly = true
-	cookie.Secure = false
-	cookie.SameSite = "Strict"
-
-	c.Cookie(cookie)
+	// Set refresh token in HTTP-only cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "Strict",
+	})
 
 	return c.Status(201).JSON(fiber.Map{
 		"user": fiber.Map{
 			"id":       user.ID,
 			"username": user.Username,
 		},
+		"access_token": accessToken,
 	})
 }
 
@@ -81,41 +76,82 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
 	}
 
-	// Compare password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
 	}
 
-	// Create JWT token
-	token, err := middleware.CreateToken(user.ID.Hex())
+	accessToken, refreshToken, err := middleware.CreateTokenPair(user.ID.Hex())
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create token"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create tokens"})
 	}
 
-	cookie := new(fiber.Cookie)
-	cookie.Name = "token"
-	cookie.Value = token
-	cookie.Expires = time.Now().Add(30 * 24 * time.Hour)
-	cookie.HTTPOnly = true
-	cookie.Secure = false
-	cookie.SameSite = "Strict"
-
-	c.Cookie(cookie)
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "Strict",
+	})
 
 	return c.Status(200).JSON(fiber.Map{
 		"user": fiber.Map{
 			"id":       user.ID,
 			"username": user.Username,
 		},
+		"access_token": accessToken,
 	})
 }
 
 func Logout(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
-		Name:    "token",
-		Value:   "",
-		Expires: time.Now().Add(-time.Hour),
+		Name:     "refresh_token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "Strict",
 	})
 	return c.SendStatus(200)
+}
+
+func RefreshToken(c *fiber.Ctx) error {
+	refreshToken := c.Cookies("refresh_token")
+	if refreshToken == "" {
+		return c.Status(401).JSON(fiber.Map{"error": "No refresh token provided"})
+	}
+
+	userId, err := middleware.ValidateRefreshToken(refreshToken)
+	if err != nil {
+		c.Cookie(&fiber.Cookie{
+			Name:     "refresh_token",
+			Value:    "",
+			Expires:  time.Now().Add(-time.Hour),
+			HTTPOnly: true,
+			Secure:   true,
+			SameSite: "Strict",
+		})
+		return c.Status(401).JSON(fiber.Map{"error": "Invalid refresh token"})
+	}
+
+	// Generate new token pair
+	accessToken, newRefreshToken, err := middleware.CreateTokenPair(userId)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create tokens"})
+	}
+
+	// Set new refresh token
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    newRefreshToken,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "Strict",
+	})
+
+	return c.JSON(fiber.Map{
+		"access_token": accessToken,
+	})
 }

@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 
 const Navbar = () => {
@@ -38,11 +39,20 @@ const Navbar = () => {
                 </ul>
                 {user ? (
                     <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <User className="h-8 w-8 text-yellow-50 hover:text-yellow-100 transition-colors" />
+                        <DropdownMenuTrigger className="outline-none">
+                            <div className="flex items-center space-x-2 p-2 
+                                rounded-full text-slate-700 hover:text-yellow-50
+                                bg-yellow-50 hover:bg-transparent
+                                border border-transparent
+                                hover:border-yellow-50 transition-colors">
+                                <User className="h-6 w-6" />
+                            </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>
+                                Account
+                            </DropdownMenuLabel>
+                            <DropdownMenuItem className="cursor-pointer text-red-500 hover:text-red-600" onClick={logout}>
                                 <LogOut className="mr-2 h-4 w-4" />
                                 Log out
                             </DropdownMenuItem>

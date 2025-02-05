@@ -41,6 +41,7 @@ func main() {
 	app.Post("/api/auth/register", controller.Register)
 	app.Post("/api/auth/login", controller.Login)
 	app.Post("/api/auth/logout", controller.Logout)
+	app.Post("/api/auth/refresh", controller.RefreshToken)
 
 	app.Get("/api/expenses", middleware.AuthMiddleware, controller.GetExpenses)
 	app.Get("/api/expenses/:id", middleware.AuthMiddleware, controller.GetExpense)

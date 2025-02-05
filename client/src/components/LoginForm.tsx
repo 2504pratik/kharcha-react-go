@@ -4,18 +4,17 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '@/main';
+import useAuth from '@/hooks/useAuth';
 
 export function LoginSignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { login } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
@@ -27,7 +26,7 @@ export function LoginSignupForm({
     const formData = new FormData(e.currentTarget);
     const data = {
       username: formData.get('email'),
-      password: formData.get('password'), // Use state value instead of FormData
+      password: formData.get('password'),
     };
   
     if (isSignup && password !== confirmPassword) {
@@ -51,11 +50,9 @@ export function LoginSignupForm({
         throw new Error(result.error || 'Authentication failed');
       }
   
-      localStorage.setItem('token', result.token);
-      localStorage.setItem('user', JSON.stringify(result.user));
-  
-      navigate('/');
-    } catch (err) {
+      // Call login with user data and access token
+      login(result.user, result.access_token);
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);

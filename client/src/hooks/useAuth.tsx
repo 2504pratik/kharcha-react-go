@@ -8,8 +8,9 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
-  logout: () => void;
+  accessToken: string | null;
+  login: (user: User, accessToken: string) => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,37 +18,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
+  // Try to get initial auth state
   useEffect(() => {
-    const getUserFromCookie = () => {
-      const userInfo = document.cookie.match('userInfo=(.*?)(;|$)');
-      return userInfo ? JSON.parse(decodeURIComponent(userInfo[1])) : null;
-    };
-
-    setUser(getUserFromCookie());
-
-    const interval = setInterval(() => {
-      setUser(getUserFromCookie());
-    }, 1000); // Check every second
-
-    return () => clearInterval(interval);
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('access_token');
+    
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setAccessToken(storedToken);
+    }
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: User, token: string) => {
     setUser(userData);
-    document.cookie = `userInfo=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=${30 * 24 * 60 * 60}`;
-    navigate('/dashboard');
-  };
-
-  const logout = async () => {
-    await fetch('/api/auth/logout', { credentials: 'include' });
-    setUser(null);
-    document.cookie = 'userInfo=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    setAccessToken(token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('access_token', token);
     navigate('/');
   };
 
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'include' 
+      });
+      
+      // Clear state and storage
+      setUser(null);
+      setAccessToken(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('access_token');
+      
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, accessToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
