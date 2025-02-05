@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { Card } from "@/components/ui/card"
 import { categories } from '@/constants';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { expenseService } from '@/services/expense.service';
+import { toast } from 'sonner';
 
 const AddExpense = () => {
+  const navigate = useNavigate();
   const [expenseData, setExpenseData] = useState({
     title: '',
     amount: '',
@@ -13,7 +17,7 @@ const AddExpense = () => {
     type: 'expense'
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setExpenseData(prev => ({
       ...prev,
@@ -21,26 +25,19 @@ const AddExpense = () => {
     }));
   };
 
-  // const handlePeopleChange = (index, value) => {
-  //   const newPeople = [...expenseData.people];
-  //   newPeople[index] = value;
-  //   setExpenseData(prev => ({
-  //     ...prev,
-  //     people: newPeople
-  //   }));
-  // };
-
-  // const addPersonField = () => {
-  //   setExpenseData(prev => ({
-  //     ...prev,
-  //     people: [...prev.people, '']
-  //   }));
-  // };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add submission logic here
-    console.log(expenseData);
+    try {
+      await expenseService.createExpense({
+        ...expenseData,
+        amount: parseFloat(expenseData.amount),
+      });
+      toast.success('Expense added successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to add expense');
+      console.error('Error adding expense:', error);
+    }
   };
 
   return (
@@ -101,26 +98,6 @@ const AddExpense = () => {
               style={{ colorScheme: 'dark' }}
               />
             </div>
-            {/* <div>
-              <label className="block text-slate-100 text-sm font-medium mb-2">People</label>
-              {expenseData.people.map((person, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  value={person}
-                  onChange={(e) => handlePeopleChange(index, e.target.value)}
-                  className="w-full p-2 mb-2 rounded-lg bg-gray-800 border border-gray-700 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
-                  placeholder={`Person ${index + 1}`}
-                />
-              ))}
-              <button 
-                type="button"
-                onClick={addPersonField}
-                className="w-full px-4 py-2 mt-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
-              >
-                Add Person
-              </button>
-            </div> */}
             <div>
               <label className="block text-slate-100 text-sm font-medium mb-2">Category</label>
               <select 

@@ -48,9 +48,9 @@ const Navbar = () => {
                                 <User className="h-6 w-6" />
                             </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuContent align="end" className="flex flex-col">
                             <DropdownMenuLabel>
-                                Account
+                                {user.username}
                             </DropdownMenuLabel>
                             <DropdownMenuItem className="cursor-pointer text-red-500 hover:text-red-600" onClick={logout}>
                                 <LogOut className="mr-2 h-4 w-4" />

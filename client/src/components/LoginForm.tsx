@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BASE_URL } from '@/main';
-import useAuth from '@/hooks/useAuth';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 export function LoginSignupForm({
   className,
@@ -45,15 +46,18 @@ export function LoginSignupForm({
       });
   
       const result = await response.json();
-  
+      
       if (!response.ok) {
         throw new Error(result.error || 'Authentication failed');
       }
-  
-      // Call login with user data and access token
+
+      // Log in the user
       login(result.user, result.access_token);
+      toast.success(`Successfully ${isSignup ? 'registered' : 'logged in'}`);
+      
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
