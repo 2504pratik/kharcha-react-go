@@ -23,13 +23,11 @@ func main() {
 
 	app := fiber.New()
 
-	if os.Getenv("ENV") == "development" {
-		app.Use(cors.New(cors.Config{
-			AllowOrigins:     "http://localhost:5173, http://localhost:3000, http://0.0.0.0:5173",
-			AllowMethods:     "GET,POST,PATCH,DELETE",
-			AllowCredentials: true,
-		}))
-	}
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173, http://localhost:3000, http://0.0.0.0:5173, https://kharcha-react-go.vercel.app/",
+		AllowMethods:     "GET,POST,PATCH,DELETE",
+		AllowCredentials: true,
+	}))
 
 	// Connect to MongoDB
 	if err := utils.Connect(); err != nil {
