@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('user');
       localStorage.removeItem('access_token');
       
-      navigate('/#/login');
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }

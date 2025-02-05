@@ -24,7 +24,7 @@ const Hero = () => {
               Track spending, detect fraud, and keep tabs on rising subscription costs.
             </blockquote>
             <button
-              onClick={() => window.location.href = '/#/login'}
+              onClick={() => window.location.href = '/login'}
               className="px-8 py-3 rounded-lg 
                     border border-solid border-yellow-50
                     bg-transparent hover:bg-yellow-50 hover:text-gray-950 transition-colors text-lg">
