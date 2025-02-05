@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["go", "nodejs", "yarn"]
+
+[phases.build]
+cmds = [
+  "cd client && yarn install && yarn build",
+  "cd server && go build -o app"
+]
+
+[start]
+cmd = "cd server && ./app"
