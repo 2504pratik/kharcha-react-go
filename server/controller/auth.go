@@ -51,7 +51,8 @@ func Register(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 		HTTPOnly: true,
 		Secure:   true,
-		SameSite: "Strict",
+		SameSite: "None",
+		Path:     "/",
 	})
 
 	return c.Status(201).JSON(fiber.Map{
@@ -92,7 +93,8 @@ func Login(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 		HTTPOnly: true,
 		Secure:   true,
-		SameSite: "Strict",
+		SameSite: "None",
+		Path:     "/",
 	})
 
 	return c.Status(200).JSON(fiber.Map{
@@ -111,7 +113,8 @@ func Logout(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(-time.Hour),
 		HTTPOnly: true,
 		Secure:   true,
-		SameSite: "Strict",
+		SameSite: "None",
+		Path:     "/",
 	})
 	return c.SendStatus(200)
 }
@@ -130,7 +133,8 @@ func RefreshToken(c *fiber.Ctx) error {
 			Expires:  time.Now().Add(-time.Hour),
 			HTTPOnly: true,
 			Secure:   true,
-			SameSite: "Strict",
+			SameSite: "None",
+			Path:     "/",
 		})
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid refresh token"})
 	}
@@ -148,7 +152,8 @@ func RefreshToken(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 		HTTPOnly: true,
 		Secure:   true,
-		SameSite: "Strict",
+		SameSite: "None",
+		Path:     "/",
 	})
 
 	return c.JSON(fiber.Map{
