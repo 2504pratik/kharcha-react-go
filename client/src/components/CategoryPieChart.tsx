@@ -59,12 +59,14 @@ const chartData = [
     { category: "Other", amount: 75, fill: chartConfig.other.color },
 ]
 
-export function CategoryPieChart() {
+export default function CategoryPieChart() {
   return (
-    <Card className="flex flex-col bg-gray-900/50 border-gray-800">
+    <Card className="flex flex-col bg-gray-900/50 border-gray-800 overflow-hidden">
       <CardHeader className="items-center pb-0">
-        <CardTitle className="text-slate-300">Category-wise Overview</CardTitle>
-        <CardDescription>Showing overview of category-wise spendings</CardDescription>
+          <CardTitle className="text-slate-300">Category-wise Kha₹cha</CardTitle>
+          <CardDescription className="truncate">
+            Showing overview of category-wise spendings
+          </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -85,14 +87,14 @@ export function CategoryPieChart() {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex text-slate-50 items-center gap-2 font-medium leading-none">
-          Shopping expenses up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-        January - June 2024
-        </div>
-      </CardFooter>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex text-slate-50 items-center gap-2 font-medium leading-none truncate">
+            Shopping expenses up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground truncate">
+            January - June 2024
+          </div>
+        </CardFooter>
     </Card>
   )
 }

@@ -1,5 +1,5 @@
 import ExpenseCard from '@/components/ExpenseCard';
-import { InteractiveCharts } from '@/components/InteractiveCharts';
+import InteractiveCharts from '@/components/InteractiveCharts';
 import { motion } from 'framer-motion';
 
 const Expenses = () => {
@@ -13,7 +13,7 @@ const Expenses = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="grid grid-cols-2 gap-12"
+        className="grid grid-cols-1 md:grid-cols-2 gap-12"
       >
         <div>
         <h2 className="text-2xl font-thin mb-4 text-slate-300">Recent Expenses</h2>

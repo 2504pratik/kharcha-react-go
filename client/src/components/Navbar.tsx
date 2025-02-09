@@ -25,7 +25,7 @@ const Navbar = () => {
                         </span>
                     </div>
                 </a>
-                <ul className='flex-1 flex justify-center items-center gap-16 max-lg:hidden'>
+                <ul className='flex-1 hidden lg:flex justify-center items-center gap-16'>
                     {navLinks.map((item) => (
                         <li key={item.label}>
                             <a

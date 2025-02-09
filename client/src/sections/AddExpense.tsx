@@ -47,7 +47,7 @@ const AddExpense = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 gap-12">
+          className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-6">
           <h2 className="text-4xl font-bold text-slate-100">Add New Kha₹cha</h2>
           <p className="text-gray-400 border-l border-slate-400 pl-6 italic">

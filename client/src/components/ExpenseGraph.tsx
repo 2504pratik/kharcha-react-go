@@ -35,14 +35,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ExpenseGraph() {
+export default function ExpenseGraph() {
   return (
-    <Card className="flex flex-col bg-gray-900/50 border-gray-800">
-      <CardHeader >
-        <CardTitle className="text-slate-300">Spending Overview</CardTitle>
-        <CardDescription>
-          Showing total spending for the last 6 months
-        </CardDescription>
+    <Card className="flex flex-col bg-gray-900/50 border-gray-800 overflow-hidden">
+      <CardHeader>
+          <CardTitle className="text-slate-300">
+            Spending Pattern
+          </CardTitle>
+          <CardDescription className="truncate">
+            Showing total spending for the last 6 months
+          </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -105,22 +107,21 @@ export function ExpenseGraph() {
               stroke="var(--color-earning)"
               stackId="a"
             />
-            
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex text-slate-50 items-center gap-2 font-medium leading-none">
-              Expenses up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
+        <CardFooter>
+          <div className="flex w-full items-start gap-2 text-sm">
+            <div className="grid gap-2">
+              <div className="flex text-slate-50 items-center gap-2 font-medium leading-none truncate">
+                Expenses up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="flex items-center gap-2 leading-none text-muted-foreground truncate">
+                January - June 2024
+              </div>
             </div>
           </div>
-        </div>
-      </CardFooter>
+        </CardFooter>
     </Card>
   )
 }
