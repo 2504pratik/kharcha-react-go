@@ -1,5 +1,6 @@
-import { TrendingUp } from "lucide-react"
-import { Pie, PieChart } from "recharts"
+import { useState, useEffect } from 'react';
+import { TrendingUp } from "lucide-react";
+import { Pie, PieChart } from "recharts";
 import {
   Card,
   CardContent,
@@ -7,18 +8,18 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import { expenseService } from "@/services/expense.service";
 
 const chartConfig = {
     amount: {
         label: "Amount",
-    },
+    } as const,
     food: {
         label: "Food",
         color: "hsl(210, 100%, 70%)", // Blue
@@ -47,19 +48,34 @@ const chartConfig = {
         label: "Other",
         color: "hsl(180, 100%, 70%)", // Cyan
     },
-} satisfies ChartConfig
+} as const;
 
-const chartData = [
-    { category: "Food", amount: 275, fill: chartConfig.food.color },
-    { category: "Transportation", amount: 115, fill: chartConfig.transportation.color },
-    { category: "Accomodation", amount: 150, fill: chartConfig.accomodation.color },
-    { category: "Entertainment", amount: 100, fill: chartConfig.entertainment.color },
-    { category: "Health", amount: 80, fill: chartConfig.health.color },
-    { category: "Shopping", amount: 50, fill: chartConfig.shopping.color },
-    { category: "Other", amount: 75, fill: chartConfig.other.color },
-]
+type ChartCategory = Exclude<keyof typeof chartConfig, 'amount'>;
 
 export default function CategoryPieChart() {
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPieChartData = async () => {
+      try {
+        const data = await expenseService.getPieChartData();
+        const formattedData = data.map(item => {
+          const category = item.category.toLowerCase() as ChartCategory;
+          return {
+            category: item.category,
+            amount: item.amount,
+            fill: chartConfig[category]?.color || chartConfig.other.color
+          };
+        });
+        setChartData(formattedData);
+      } catch (error) {
+        console.error('Failed to fetch pie chart data', error);
+      }
+    };
+
+    fetchPieChartData();
+  }, []);
+
   return (
     <Card className="flex flex-col bg-gray-900/50 border-gray-800 overflow-hidden">
       <CardHeader className="items-center pb-0">
@@ -96,5 +112,5 @@ export default function CategoryPieChart() {
           </div>
         </CardFooter>
     </Card>
-  )
+  );
 }

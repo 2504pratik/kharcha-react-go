@@ -25,7 +25,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:5173, http://localhost:3000, http://0.0.0.0:5173, https://kharcha-react-go.vercel.app/",
-		AllowMethods:     "GET,POST,PATCH,DELETE",
+		AllowMethods:     "GET,POST,PUT,DELETE",
 		AllowHeaders:     "Authorization, Content-Type",
 		AllowCredentials: true,
 	}))
@@ -47,6 +47,9 @@ func main() {
 	app.Post("/api/expenses", middleware.AuthMiddleware, controller.CreateExpense)
 	app.Put("/api/expenses/:id", middleware.AuthMiddleware, controller.UpdateExpense)
 	app.Delete("/api/expenses/:id", middleware.AuthMiddleware, controller.DeleteExpense)
+
+	app.Get("/api/charts/pie", middleware.AuthMiddleware, controller.GetPieChartData)
+	app.Get("/api/charts/expense-graph", middleware.AuthMiddleware, controller.GetExpenseGraphData)
 
 	PORT := os.Getenv("PORT")
 	if PORT == "" {

@@ -13,6 +13,17 @@ export interface Expense {
   updatedAt?: string;
 }
 
+export interface PieChartData {
+  category: string;
+  amount: number;
+}
+
+export interface MonthlyExpenseData {
+  month: string;
+  earning: number;
+  expense: number;
+}
+
 export const expenseService = {
   async getExpenses(): Promise<Expense[]> {
     const response = await fetchWithAuth(`${BASE_URL}/expenses`);
@@ -27,6 +38,33 @@ export const expenseService = {
       },
       body: JSON.stringify(expenseData),
     });
+    return response.json();
+  },
+
+  async updateExpense(id: string, expenseData: Partial<Expense>): Promise<Expense> {
+    const response = await fetchWithAuth(`${BASE_URL}/expenses/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(expenseData),
+    });
+    return response.json();
+  },
+
+  async deleteExpense(id: string): Promise<void> {
+    await fetchWithAuth(`${BASE_URL}/expenses/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async getPieChartData(): Promise<PieChartData[]> {
+    const response = await fetchWithAuth(`${BASE_URL}/charts/pie`);
+    return response.json();
+  },
+
+  async getExpenseGraphData(): Promise<MonthlyExpenseData[]> {
+    const response = await fetchWithAuth(`${BASE_URL}/charts/expense-graph`);
     return response.json();
   }
 };

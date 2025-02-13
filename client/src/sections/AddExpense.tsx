@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card"
 import { categories } from '@/constants';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { expenseService } from '@/services/expense.service';
 import { toast } from 'sonner';
 
 const AddExpense = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const editExpense = location.state?.expense;
+
   const [expenseData, setExpenseData] = useState({
     title: '',
     amount: '',
@@ -16,6 +19,19 @@ const AddExpense = () => {
     category: 'Food',
     type: 'expense'
   });
+
+  useEffect(() => {
+    if (editExpense) {
+      setExpenseData(editExpense);
+    }
+  }, [editExpense]);
+
+  useEffect(() => {
+    if (editExpense) {
+      const element = document.getElementById('add-new');
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [editExpense]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -28,17 +44,26 @@ const AddExpense = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await expenseService.createExpense({
+      const formattedData = {
         ...expenseData,
         amount: parseFloat(expenseData.amount),
-      });
-      toast.success('Expense added successfully');
+      };
+
+      if (editExpense?._id) {
+        await expenseService.updateExpense(editExpense._id, formattedData);
+        toast.success('Expense updated successfully');
+      } else {
+        await expenseService.createExpense(formattedData);
+        toast.success('Expense added successfully');
+      }
       navigate('/');
     } catch (error) {
-      toast.error('Failed to add expense');
-      console.error('Error adding expense:', error);
+      toast.error(editExpense ? 'Failed to update expense' : 'Failed to add expense');
+      console.error('Error with expense:', error);
     }
   };
+
+  const isEditMode = Boolean(editExpense);
 
   return (
     <section id="add-new" className="py-4">
@@ -49,10 +74,13 @@ const AddExpense = () => {
           transition={{ duration: 0.5 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-6">
-          <h2 className="text-4xl font-bold text-slate-100">Add New Kha₹cha</h2>
+          <h2 className="text-4xl font-bold text-slate-100">
+            {isEditMode ? 'Update Kha₹cha' : 'Add New Kha₹cha'}
+          </h2>
           <p className="text-gray-400 border-l border-slate-400 pl-6 italic">
-            Keep track of your spending by adding your expenses. We'll help you categorize
-            and analyze your spending patterns.
+          {isEditMode 
+                ? 'Update your expense details below. Keep your records accurate and up to date.'
+                : 'Keep track of your spending by adding your expenses. We\'ll help you categorize and analyze your spending patterns.'}
           </p>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-pink-400/20 blur-3xl rounded-full" />
@@ -141,7 +169,7 @@ const AddExpense = () => {
             <button className="w-full px-8 py-3 rounded-lg 
                     border border-solid border-gray-800 text-slate-300
                     bg-gray-800 hover:bg-yellow-50 hover:text-gray-950 transition-colors text-lg">
-              Add Expense
+              {isEditMode ? 'Update Expense' : 'Add Expense'}
             </button>
           </form>
         </Card>

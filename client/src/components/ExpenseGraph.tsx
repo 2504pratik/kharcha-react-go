@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { TrendingUp } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import {
@@ -14,18 +15,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-
-const chartData = [
-  { month: "January", earning: 186, expense: 80 },
-  { month: "February", earning: 305, expense: 200 },
-  { month: "March", earning: 237, expense: 120 },
-  { month: "April", earning: 73, expense: 190 },
-  { month: "May", earning: 209, expense: 130 },
-  { month: "June", earning: 214, expense: 140 },
-]
+import { expenseService, MonthlyExpenseData } from "@/services/expense.service"
 
 const chartConfig = {
-    earning: {
+  earning: {
     label: "Earning",
     color: "hsl(var(--chart-2))",
   },
@@ -36,15 +29,49 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ExpenseGraph() {
+  const [chartData, setChartData] = useState<MonthlyExpenseData[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await expenseService.getExpenseGraphData()
+        setChartData(data)
+      } catch (err) {
+        setError("Failed to load expense data")
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  // Calculate expense change percentage
+  const lastTwoMonths = chartData.slice(-2)
+  const expenseChange = lastTwoMonths.length === 2
+    ? ((lastTwoMonths[1].expense - lastTwoMonths[0].expense) / lastTwoMonths[0].expense * 100).toFixed(1)
+    : "0"
+
   return (
     <Card className="flex flex-col bg-gray-900/50 border-gray-800 overflow-hidden">
       <CardHeader>
-          <CardTitle className="text-slate-300">
-            Spending Pattern
-          </CardTitle>
-          <CardDescription className="truncate">
-            Showing total spending for the last 6 months
-          </CardDescription>
+        <CardTitle className="text-slate-300">
+          Spending Pattern
+        </CardTitle>
+        <CardDescription className="truncate">
+          Showing total spending for the last 6 months
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -110,18 +137,18 @@ export default function ExpenseGraph() {
           </AreaChart>
         </ChartContainer>
       </CardContent>
-        <CardFooter>
-          <div className="flex w-full items-start gap-2 text-sm">
-            <div className="grid gap-2">
-              <div className="flex text-slate-50 items-center gap-2 font-medium leading-none truncate">
-                Expenses up by 5.2% this month <TrendingUp className="h-4 w-4" />
-              </div>
-              <div className="flex items-center gap-2 leading-none text-muted-foreground truncate">
-                January - June 2024
-              </div>
+      <CardFooter>
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex text-slate-50 items-center gap-2 font-medium leading-none truncate">
+              Expenses {Number(expenseChange) >= 0 ? "up" : "down"} by {Math.abs(Number(expenseChange))}% this month <TrendingUp className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-2 leading-none text-muted-foreground truncate">
+              {chartData[0]?.month} - {chartData[chartData.length - 1]?.month} {new Date().getFullYear()}
             </div>
           </div>
-        </CardFooter>
+        </div>
+      </CardFooter>
     </Card>
   )
 }
